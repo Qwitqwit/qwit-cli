@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+
+Show command with a default number of lines of 100
+
+´´´bash
+qwit show --source --some_dsv_file.csv
+´´´
+
+you can also specify the number of lines
+
+´´´bash
+qwit show --source --some_dsv_file.csv --num 99
+´´´
+
 
 ## [0.1.1] - 2023-12-05
 
