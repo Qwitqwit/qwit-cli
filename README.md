@@ -1,5 +1,9 @@
 # qwit-cli
 
+## Links
+
+[crates.io](https://crates.io/crates/qwit)
+
 ## Install the cli
 
 ### Cargo
