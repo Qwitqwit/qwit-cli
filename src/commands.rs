@@ -1,6 +1,5 @@
 use clap::{Parser, Subcommand};
 
-
 pub fn figure() -> Result<String, String> {
     let cli = Cli::parse();
 
@@ -26,5 +25,4 @@ enum Commands {
         #[arg(short, long, env = "Q_MESSAGE")]
         message: String,
     },
-
 }

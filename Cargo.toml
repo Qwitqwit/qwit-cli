@@ -2,6 +2,11 @@
 name = "qwit"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
+repository = "https://github.com/Qwitqwit/qwit-cli"
+documentation = "https://github.com/Qwitqwit/qwit-cli"
+homepage = "https://github.com/Qwitqwit/qwit-cli"
+description = "A cli to work with dsv files"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

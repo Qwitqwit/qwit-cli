@@ -1,6 +1,5 @@
 #![warn(clippy::pedantic)]
 
-
 mod commands;
 
 fn main() {
