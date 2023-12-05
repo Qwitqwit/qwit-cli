@@ -12,3 +12,8 @@ description = "A cli to work with dsv files"
 
 [dependencies]
 clap = { version = "4.4.8", features = ["derive", "unstable-doc", "env"] }
+qwitlib = "0.1.2"
+
+
+[dev-dependencies]
+tempfile = "3"

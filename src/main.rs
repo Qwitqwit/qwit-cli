@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 
 mod commands;
+mod show;
 
 fn main() {
     match commands::figure() {
