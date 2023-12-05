@@ -26,12 +26,12 @@ watch:
 
 # Run the tests
 test:
-    cargo hack test --feature-powerset --locked
+    cargo hack test --feature-powerset
 
 # Run the static code analysis
 lint:
     cargo fmt --all -- --check
-    cargo hack clippy --feature-powerset --all-targets --workspace --locked
+    cargo hack clippy --feature-powerset --all-targets --workspace
 
 # Install cargo dev-tools used by the `verify` recipe (requires rustup to be already installed)
 # you may need to install perl IPC cmd "yum install perl-IPC-Cmd" and install the perl module "cpan install File::Remote"
