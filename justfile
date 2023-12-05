@@ -38,7 +38,7 @@ lint:
 install-dev-tools:
     rustup install stable
     rustup override set stable
-    cargo install cargo-hack cargo-watch cargo-deny hurl
+    cargo install cargo-hack cargo-watch cargo-deny
     cargo install cargo-release
 
 clean:
