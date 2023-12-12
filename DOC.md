@@ -16,7 +16,7 @@ qwit cli
 
 ###### **Subcommands:**
 
-* `markdown` — [STABLE] create markdown of doc of qwit
+* `markdown` — [STABLE] print markdown doc of qwit to std out
 * `show` — [STABLE] show the dsv from the start in a nice way
 
 ###### **Options:**
@@ -29,7 +29,7 @@ qwit cli
 
 ## `qwit markdown`
 
-[STABLE] create markdown of doc of qwit
+[STABLE] print markdown doc of qwit to std out
 
 **Usage:** `qwit markdown`
 

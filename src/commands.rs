@@ -27,7 +27,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// [STABLE] create markdown of doc of qwit
+    /// [STABLE] print markdown doc of qwit to std out
     Markdown,
 
     /// [STABLE] show the dsv from the start in a nice way

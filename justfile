@@ -52,9 +52,9 @@ fmt:
 pub:
     cargo publish
 
-
-create-doc:
-    
+# latest doc file
+create-doc: install
+    qwit markdown > DOC.md
 
 
 release *args: verify
