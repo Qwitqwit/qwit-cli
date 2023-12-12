@@ -2,6 +2,7 @@
 
 mod commands;
 mod show;
+mod schema;
 
 fn main() {
     match commands::figure() {
