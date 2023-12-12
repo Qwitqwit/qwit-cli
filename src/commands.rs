@@ -1,11 +1,17 @@
 use clap::{Parser, Subcommand};
 
+use crate::schema::validation;
 use crate::show;
 
 pub fn figure() -> Result<String, String> {
     let cli = Cli::parse();
 
     let result: Result<String, String> = match cli.command {
+        Some(Commands::Validation {
+            schema,
+            source,
+            num,
+        }) => validation(&schema, source, num),
         Some(Commands::Markdown) => Ok(clap_markdown::help_markdown::<Cli>()),
         Some(Commands::Show { source, num }) => show::csv(source, num),
         None => Ok("try qwit --help for information on how to use qwit".to_string()),
@@ -36,5 +42,14 @@ enum Commands {
         source: String,
         #[arg(short, long, env = "Q_NUM", default_value_t = 100)]
         num: i64,
+    },
+    /// [PREVIEW] validate a dsv file against a dsv schema
+    Validation {
+        #[arg(short, long, env = "Q_SCHEMA_SOURCE")]
+        schema: String,
+        #[arg(short, long, env = "Q_SOURCE")]
+        source: String,
+        #[arg(short, long, env = "Q_NUM")]
+        num: Option<i64>,
     },
 }

@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 
 mod commands;
+mod schema;
 mod show;
 
 fn main() {

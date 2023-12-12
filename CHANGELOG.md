@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## Added 
+
+Command to validate a dsv file against a dsv schema
 
 ## [0.1.6] - 2023-12-12
 
