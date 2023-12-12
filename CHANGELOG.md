@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 
+## [0.1.4] - 2023-12-12
+
+
 ## [0.1.3] - 2023-12-12
 
 
@@ -40,7 +43,8 @@ Add readme
 Initial release
 
 
-[Unreleased]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.0...v0.1.1
