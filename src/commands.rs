@@ -6,9 +6,11 @@ pub fn figure() -> Result<String, String> {
     let cli = Cli::parse();
 
     let result: Result<String, String> = match cli.command {
+        Some(Commands::Markdown) => Ok(clap_markdown::help_markdown::<Cli>()),
         Some(Commands::Show { source, num }) => show::csv(source, num),
         None => Ok("try qwit --help for information on how to use qwit".to_string()),
     };
+
     result
 }
 
@@ -25,6 +27,9 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// [STABLE] create markdown of doc of qwit
+    Markdown,
+
     /// [STABLE] show the dsv from the start in a nice way
     Show {
         #[arg(short, long, env = "Q_SOURCE")]

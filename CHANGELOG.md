@@ -4,6 +4,10 @@
 
 ### Added
 
+A way to create markdown from the cli
+
+Documentation file
+
 Show command with a default number of lines of 100
 
 ´´´bash

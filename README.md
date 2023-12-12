@@ -2,7 +2,9 @@
 
 ## Links
 
-[crates.io](https://crates.io/crates/qwit)
+[crates.io](https://crates.io/crates/qwit)t
+
+## [Documentation](DOC.md)
 
 ## Install the cli
 

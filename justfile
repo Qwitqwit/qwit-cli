@@ -53,6 +53,10 @@ pub:
     cargo publish
 
 
+create-doc:
+    
+
+
 release *args: verify
     test $GITHUB_TOKEN
     test $CARGO_REGISTRY_TOKEN
