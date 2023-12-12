@@ -1,8 +1,8 @@
 #![warn(clippy::pedantic)]
 
 mod commands;
-mod show;
 mod schema;
+mod show;
 
 fn main() {
     match commands::figure() {
