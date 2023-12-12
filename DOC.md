@@ -7,6 +7,7 @@ This document contains the help content for the `qwit` command-line program.
 * [`qwit`↴](#qwit)
 * [`qwit markdown`↴](#qwit-markdown)
 * [`qwit show`↴](#qwit-show)
+* [`qwit validation`↴](#qwit-validation)
 
 ## `qwit`
 
@@ -18,6 +19,7 @@ qwit cli
 
 * `markdown` — [STABLE] print markdown doc of qwit to std out
 * `show` — [STABLE] show the dsv from the start in a nice way
+* `validation` — [PREVIEW] validate a dsv file against a dsv schema
 
 ###### **Options:**
 
@@ -47,6 +49,20 @@ qwit cli
 * `-n`, `--num <NUM>`
 
   Default value: `100`
+
+
+
+## `qwit validation`
+
+[PREVIEW] validate a dsv file against a dsv schema
+
+**Usage:** `qwit validation [OPTIONS] --schema <SCHEMA> --source <SOURCE>`
+
+###### **Options:**
+
+* `-s`, `--schema <SCHEMA>`
+* `-s`, `--source <SOURCE>`
+* `-n`, `--num <NUM>`
 
 
 
