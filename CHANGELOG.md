@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [1.0.0] - 2023-12-13
+
 ## Fixed
 
 Validation command
@@ -53,7 +56,8 @@ Add readme
 Initial release
 
 
-[Unreleased]: https://github.com/Qwitqwit/qwit-cli/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Qwitqwit/qwit-cli/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/Qwitqwit/qwit-cli/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.6...v0.2.0
 [0.1.6]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/Qwitqwit/qwit-cli/compare/v0.1.4...v0.1.5
