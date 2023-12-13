@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::schema::validation;
+use crate::schema_command::validation;
 use crate::show;
 
 pub fn figure() -> Result<String, String> {
