@@ -2,6 +2,7 @@ use super::type_::{Tipe, Type};
 
 const SCHEMA_SEPERATOR: &char = &';';
 
+#[derive(Debug)]
 pub struct Column {
     pub header: String,
     pub val_required: bool,
@@ -35,7 +36,10 @@ impl Column {
         let tipe: Tipe = tipe.as_str().into();
 
         let header: String = if header.contains(sep) {
-            return Err("header containsa a seperator, this is not allowed".to_string());
+            return Err(format!(
+                "header contains the seperator ->{sep}<-, this is not allowed ->{header}<-"
+            )
+            .to_string());
         } else {
             header.to_string()
         };

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## Fixed
+
+Validation command
 
 ## [0.2.0] - 2023-12-12
 

@@ -8,16 +8,16 @@ pub struct Schema {
 }
 
 impl Schema {
-    pub fn from_file(path: &str) -> Result<Self, String> {
-        let lines = read_lines(path).map_err(|err| format!("{err:?}"))?;
+    pub fn from_file(path: &str) -> Result<Self, Vec<String>> {
+        let lines = read_lines(path).map_err(|err| vec![format!("{err:?}")])?;
         Ok(lines.map_while(Result::ok).collect())
     }
 
-    pub fn check_line(&self, row: &str, line_pos: usize) -> Result<(), String> {
+    pub fn check_line(&self, row: &str, line_pos: usize) -> Result<(), Vec<String>> {
         let mut errors: Vec<String> = vec![];
 
         let add_error = |err: &str| {
-            let f = format!("on row {line_pos}, problem found: {err}");
+            let f = format!("on row {line_pos}, problem found -> {err}");
             errors.push(f);
         };
 
@@ -30,7 +30,7 @@ impl Schema {
         if errors.is_empty() {
             Ok(())
         } else {
-            Err(errors.concat())
+            Err(errors)
         }
     }
 
@@ -38,8 +38,8 @@ impl Schema {
         let splitted: Vec<&str> = row.split(&self.seperator).collect();
         for (col_pos, col) in self.columns.iter().enumerate() {
             if let Some(value) = splitted.get(col_pos) {
-                if value.to_lowercase() != col.header {
-                    add_error(&format!("found column with wrong name at col {line_pos} should have been {} but was {value}", col.header));
+                if value.to_lowercase() != col.header.to_lowercase() {
+                    add_error(&format!("found header with wrong name at col {line_pos} should have been {} but was {value}", col.header));
                 }
             } else if col.col_required {
                 add_error(&format!(
@@ -65,16 +65,14 @@ impl Schema {
     fn check_types(col: &Column, value: &&str, line_pos: usize, mut add_error: impl FnMut(&str)) {
         match &col.type_ {
             Type::Integer(_default) => {
-                if value.parse::<i64>().is_err() {
-                    add_error(&format!(
-                        "value: {value} at {line_pos} should have been an integer"
-                    ));
+                if value.parse::<i64>().is_err() && !value.is_empty() {
+                    add_error(&format!("value: ->{value}<- should have been an integer"));
                 }
             }
             Type::Float(_default) => {
-                if value.parse::<f64>().is_err() {
+                if value.parse::<f64>().is_err() && !value.is_empty() {
                     add_error(&format!(
-                        "value: {value} at {line_pos} should have been an float",
+                        "value: ->{value}<- at {line_pos} should have been an float",
                     ));
                 }
             }
@@ -82,7 +80,7 @@ impl Schema {
             Type::Enum(values) => {
                 if !values.contains(&(*value).to_string()) {
                     add_error(&format!(
-                        "value: {value} at {line_pos} should have been an part of {values:?}",
+                        "value: ->{value}<- at {line_pos} should have been an part of {values:#?}",
                     ));
                 }
             }
@@ -101,15 +99,22 @@ impl FromIterator<String> for Schema {
                     .split("sep=")
                     .map(std::borrow::ToOwned::to_owned)
                     .collect();
-                seperator = first_line[0].clone();
-            } else {
+
+                seperator = first_line[1].clone();
+                println!("seperator found: {seperator}");
+            } else if pos > 1 {
                 match Column::from_row(&col_row, &seperator) {
                     Ok(s_col) => columns.push(s_col),
-                    Err(err) => println!("found wrong column description at row {pos} for {err}"),
+                    Err(err) => {
+                        if !col_row.is_empty() {
+                            println!("found wrong column description at row {pos} for {err}, line {col_row}");
+                        }
+                    }
                 }
             }
         }
 
+        println!("schema done {columns:#?}");
         Self { seperator, columns }
     }
 }

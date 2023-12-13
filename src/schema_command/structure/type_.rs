@@ -1,6 +1,7 @@
 const ENUM_SEPERATOR: &char = &',';
 
 // With misc included
+#[derive(Debug)]
 pub enum Type {
     Integer(i64),
     Float(f64),
@@ -11,12 +12,16 @@ pub enum Type {
 impl Type {
     pub fn from_tipe(tipe: Tipe, misc: &str) -> Result<Self, String> {
         match tipe {
-            Tipe::Integer => Ok(Type::Integer(
-                misc.parse::<i64>().map_err(|err| err.to_string())?,
-            )),
-            Tipe::Float => Ok(Type::Float(
-                misc.parse::<f64>().map_err(|err| err.to_string())?,
-            )),
+            Tipe::Integer => Ok(Type::Integer(if misc.is_empty() {
+                -1
+            } else {
+                misc.parse::<i64>().map_err(|err| err.to_string())?
+            })),
+            Tipe::Float => Ok(Type::Float(if misc.is_empty() {
+                -1.0
+            } else {
+                misc.parse::<f64>().map_err(|err| err.to_string())?
+            })),
             Tipe::String => Ok(Type::String),
             Tipe::Enum => Ok(Type::Enum(
                 misc.split(*ENUM_SEPERATOR)
