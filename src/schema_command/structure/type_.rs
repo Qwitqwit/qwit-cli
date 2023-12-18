@@ -1,7 +1,7 @@
 const ENUM_SEPERATOR: &char = &',';
 
 // With misc included
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Type {
     Integer(i64),
     Float(f64),

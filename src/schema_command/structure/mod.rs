@@ -1,15 +1,17 @@
 use std::{
     fs::File,
     io::{BufReader, Lines},
-    num::TryFromIntError,
 };
+
+use rayon::prelude::*;
 
 mod col;
 mod schema;
 mod type_;
 
-use rand::seq::SliceRandom;
 pub use schema::Schema;
+
+use self::type_::Type;
 
 const RES: &str = r"
 _________check done_________";
@@ -17,46 +19,147 @@ _________check done_________";
 pub fn check(
     lines: Lines<BufReader<File>>,
     schema: &schema::Schema,
-    num: Option<i64>,
     print: bool,
 ) -> Result<String, Vec<String>> {
-    let mut rng = rand::thread_rng();
+    let par_it: Vec<std::io::Result<std::string::String>> = lines.collect();
 
-    let sized_lines = match num {
-        Some(num) => lines.take(
-            num.try_into()
-                .map_err(|err: TryFromIntError| err.to_string())
-                .map_err(|err| vec![err])?,
-        ),
-        None => lines.take(usize::MAX),
-    };
+    let size = par_it.len();
 
-    let mut errors: Vec<String> = vec![];
+    println!("rows read: {size}");
 
-    sized_lines
-        .filter_map(std::result::Result::ok)
+    let filtered = par_it
+        .par_iter()
+        .filter_map(|res| match res {
+            Ok(res) => Some(res),
+            Err(_) => None,
+        })
         .filter(|l| !l.starts_with("sep="))
+        .collect::<Vec<_>>();
+
+    let result = filtered
+        .par_iter()
         .enumerate()
-        .for_each(|(n, line)| {
-            let error = schema.check_line(&line, n);
+        .filter(|(_, l)| !l.starts_with("sep="))
+        .map(|(n, line)| {
+            let res = schema.check_line(line, n);
 
-            if let Err(mut err) = error {
-                errors.append(&mut err);
-            }
-
+            let id = std::thread::current().id();
             if print && n % 100_000 == 0 {
-                let err = errors.choose(&mut rng);
-                println!(
-                    "--at line {n}, {} errors in total, one of them {:#?}",
-                    errors.len(),
-                    err.unwrap_or(&"None".to_owned())
-                );
+                if let Err(err) = res.clone() {
+                    println!("--at line {n} for Thread [{id:?}] found err {err:#?}");
+                }
             }
+            res
         });
+    let errors: Vec<_> = result
+        .filter_map(std::result::Result::err)
+        .flatten()
+        .map(|err| err.message())
+        .collect();
 
     if errors.is_empty() {
         Ok(RES.to_owned())
     } else {
-        Err(errors)
+        Err(errors.into_iter().collect())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum SchemaError {
+    Header {
+        row_pos: usize,
+        col_pos: usize,
+        header: String,
+        descripton: String,
+        row_: Vec<String>,
+        sep: String,
+    },
+    Column {
+        row_pos: usize,
+        col_pos: usize,
+        header: String,
+        descripton: String,
+        row_: Vec<String>,
+        sep: String,
+    },
+    ValueMissing {
+        row_pos: usize,
+        col_pos: usize,
+        header: String,
+        descripton: String,
+        row_: Vec<String>,
+        sep: String,
+    },
+    Type {
+        row_pos: usize,
+        col_pos: usize,
+        header: String,
+        type_: Type,
+        descripton: String,
+        row_: Vec<String>,
+        sep: String,
+    },
+}
+impl SchemaError {
+    pub fn message(&self) -> String {
+        match self {
+            SchemaError::Header {
+                row_pos,
+                col_pos,
+                header,
+                descripton,
+                row_,
+                sep
+            } => format!("HeaderError-> header: {header}, row: {row_pos}, col: {col_pos}, description: {descripton}  row: {}", row_.to_pos_error(*col_pos, sep)),
+            SchemaError::Column {
+                row_pos,
+                col_pos,
+                header,
+                descripton,
+                row_,
+                sep
+            } => format!("ColumnError-> header: {header}, row: {row_pos}, col: {col_pos}, description: {descripton}  row: {}", row_.to_pos_error(*col_pos, sep)),
+            SchemaError::ValueMissing {
+                row_pos,
+                col_pos,
+                header,
+                descripton,
+                row_,
+                sep
+            } => format!("ValueMissingError-> header: {header}, row: {row_pos}, col: {col_pos}, description: {descripton} row: {}", row_.to_pos_error(*col_pos, sep)),
+            SchemaError::Type {
+                row_pos,
+                col_pos,
+                header,
+                type_,
+                descripton,
+                row_,
+                sep
+            } => format!("TypeError-> header: {header}, expected type: {type_:?} row: {row_pos}, col: {col_pos}, description: {descripton} row: {}", row_.to_pos_error(*col_pos, sep))
+            }
+    }
+}
+
+trait PositionedErrorString {
+    fn to_pos_error(&self, col_pos: usize, sep: &str) -> String;
+}
+
+impl PositionedErrorString for Vec<String> {
+    fn to_pos_error(&self, col_pos: usize, sep: &str) -> String {
+        let splitted = self.split_at(col_pos);
+        let mut first = splitted.0.to_vec();
+        let second = splitted.1;
+        let splitted_second: (&[String], &[String]) = second.split_at(1);
+        let error_value = splitted_second.0.get(0);
+        let mut third = splitted_second.1.to_vec();
+
+        let value = match error_value {
+            Some(value) => format!("->{}<-", &value),
+            None => String::new(),
+        };
+
+        first.push(value);
+        first.append(&mut third);
+        first.join(sep)
     }
 }

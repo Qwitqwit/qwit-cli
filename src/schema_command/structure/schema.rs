@@ -1,6 +1,6 @@
 use qwitlib::lines::read_lines;
 
-use super::{col::Column, type_::Type};
+use super::{col::Column, type_::Type, SchemaError};
 
 pub struct Schema {
     seperator: String,
@@ -13,18 +13,19 @@ impl Schema {
         Ok(lines.map_while(Result::ok).collect())
     }
 
-    pub fn check_line(&self, row: &str, line_pos: usize) -> Result<(), Vec<String>> {
-        let mut errors: Vec<String> = vec![];
-
-        let add_error = |err: &str| {
-            let f = format!("on row {line_pos}, problem found -> {err}");
-            errors.push(f);
-        };
+    pub fn check_line(&self, row: &str, line_pos: usize) -> Result<(), Vec<SchemaError>> {
+        let mut errors: Vec<SchemaError> = vec![];
 
         if line_pos == 0 {
-            self.check_header(row, line_pos, add_error);
+            let res = self.check_header(row, line_pos);
+            if let Err(mut err) = res {
+                errors.append(&mut err);
+            }
         } else {
-            self.check_normal_line(row, line_pos, add_error);
+            let res = self.check_normal_line(row, line_pos);
+            if let Err(mut err) = res {
+                errors.append(&mut err);
+            }
         }
 
         if errors.is_empty() {
@@ -34,56 +35,132 @@ impl Schema {
         }
     }
 
-    fn check_header(&self, row: &str, line_pos: usize, mut add_error: impl FnMut(&str)) {
-        let splitted: Vec<&str> = row.split(&self.seperator).collect();
+    fn check_header(&self, row: &str, line_pos: usize) -> Result<(), Vec<SchemaError>> {
+        let mut errors: Vec<SchemaError> = vec![];
+
+        let splitted: Vec<String> = row
+            .split(&self.seperator)
+            .map(std::string::ToString::to_string)
+            .collect();
+
         for (col_pos, col) in self.columns.iter().enumerate() {
-            if let Some(value) = splitted.get(col_pos) {
+            if let Some(value) = splitted.clone().get(col_pos) {
                 if value.to_lowercase() != col.header.to_lowercase() {
-                    add_error(&format!("found header with wrong name at col {line_pos} should have been {} but was {value}", col.header));
+                    errors.push(SchemaError::Header {
+                        row_pos: line_pos,
+                        col_pos,
+                        header: col.header.clone(),
+                        descripton: "wrong header".to_owned(),
+                        row_: splitted.clone(),
+                        sep: self.seperator.clone(),
+                    });
                 }
             } else if col.col_required {
-                add_error(&format!(
-                    "found no column at col {col_pos} should have been {}",
-                    col.header
-                ));
+                errors.push(SchemaError::Column {
+                    row_pos: line_pos,
+                    col_pos,
+                    header: col.header.clone(),
+                    descripton: "column missing".to_owned(),
+                    row_: splitted.clone(),
+                    sep: self.seperator.clone(),
+                });
             }
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
         }
     }
 
-    fn check_normal_line(&self, row: &str, line_pos: usize, mut add_error: impl FnMut(&str)) {
-        let splitted: Vec<&str> = row.split(&self.seperator).collect();
+    fn check_normal_line(&self, row: &str, line_pos: usize) -> Result<(), Vec<SchemaError>> {
+        let mut errors: Vec<SchemaError> = vec![];
 
+        let splitted: Vec<String> = row
+            .split(&self.seperator)
+            .map(std::string::ToString::to_string)
+            .collect();
         for (col_pos, col) in self.columns.iter().enumerate() {
-            if let Some(value) = splitted.get(col_pos) {
-                Self::check_types(col, value, line_pos, &mut add_error);
+            if let Some(value) = splitted.clone().get(col_pos) {
+                let res = self.check_types(col, value, line_pos, col_pos, splitted.clone());
+                if let Err(mut err) = res {
+                    errors.append(&mut err);
+                }
             } else if col.val_required {
-                add_error(&format!("found no value at col {col_pos}"));
+                errors.push(SchemaError::ValueMissing {
+                    row_pos: line_pos,
+                    col_pos,
+                    header: col.header.clone(),
+                    descripton: "value missing".to_owned(),
+                    row_: splitted.clone(),
+                    sep: self.seperator.clone(),
+                });
             };
         }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
+        }
     }
 
-    fn check_types(col: &Column, value: &&str, line_pos: usize, mut add_error: impl FnMut(&str)) {
+    fn check_types(
+        &self,
+        col: &Column,
+        value: &str,
+        line_pos: usize,
+        col_pos: usize,
+        splitted: Vec<String>,
+    ) -> Result<(), Vec<SchemaError>> {
+        let mut errors: Vec<SchemaError> = vec![];
+
         match &col.type_ {
-            Type::Integer(_default) => {
+            Type::Integer(default) => {
                 if value.parse::<i64>().is_err() && !value.is_empty() {
-                    add_error(&format!("value: ->{value}<- should have been an integer"));
+                    errors.push(SchemaError::Type {
+                        row_pos: line_pos,
+                        col_pos,
+                        header: col.header.clone(),
+                        descripton: "wrong type".to_owned(),
+                        row_: splitted,
+                        sep: self.seperator.clone(),
+                        type_: Type::Integer(*default),
+                    });
                 }
             }
-            Type::Float(_default) => {
+            Type::Float(default) => {
                 if value.parse::<f64>().is_err() && !value.is_empty() {
-                    add_error(&format!(
-                        "value: ->{value}<- at {line_pos} should have been an float",
-                    ));
+                    errors.push(SchemaError::Type {
+                        row_pos: line_pos,
+                        col_pos,
+                        header: col.header.clone(),
+                        descripton: "wrong type".to_owned(),
+                        row_: splitted,
+                        sep: self.seperator.clone(),
+                        type_: Type::Float(*default),
+                    });
                 }
             }
             Type::String => (),
             Type::Enum(values) => {
                 if !values.contains(&(*value).to_string()) {
-                    add_error(&format!(
-                        "value: ->{value}<- at {line_pos} should have been an part of {values:#?}",
-                    ));
+                    errors.push(SchemaError::Type {
+                        row_pos: line_pos,
+                        col_pos,
+                        header: col.header.clone(),
+                        descripton: "wrong type".to_owned(),
+                        row_: splitted,
+                        sep: self.seperator.clone(),
+                        type_: Type::Enum(values.clone()),
+                    });
                 }
             }
+        }
+
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
         }
     }
 }
