@@ -2,7 +2,7 @@
 
 ## Links
 
-[crates.io](https://crates.io/crates/qwit)t
+[crates.io](https://crates.io/crates/qwit)
 
 ## [Documentation](DOC.md)
 
