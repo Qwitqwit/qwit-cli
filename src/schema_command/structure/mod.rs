@@ -3,8 +3,6 @@ use std::{
     io::{BufReader, Lines},
 };
 
-use rayon::prelude::*;
-
 mod col;
 mod schema;
 mod type_;
@@ -21,46 +19,34 @@ pub fn check(
     schema: &schema::Schema,
     print: bool,
 ) -> Result<String, Vec<String>> {
-    let par_it: Vec<std::io::Result<std::string::String>> = lines.collect();
-
-    let size = par_it.len();
-
-    println!("rows read: {size}");
-
-    let filtered = par_it
-        .par_iter()
+    let result: Vec<_> = lines
         .filter_map(|res| match res {
             Ok(res) => Some(res),
             Err(_) => None,
         })
         .filter(|l| !l.starts_with("sep="))
-        .collect::<Vec<_>>();
-
-    let result = filtered
-        .par_iter()
         .enumerate()
         .filter(|(_, l)| !l.starts_with("sep="))
         .map(|(n, line)| {
-            let res = schema.check_line(line, n);
+            let res = schema.check_line(&line, n);
 
-            let id = std::thread::current().id();
             if print && n % 100_000 == 0 {
                 if let Err(err) = res.clone() {
-                    println!("--at line {n} for Thread [{id:?}] found err {err:#?}");
+                    println!("--at line {n} found err {err:#?}");
+                } else {
+                    println!("--at line {n} no errors");
                 }
             }
             res
-        });
-    let errors: Vec<_> = result
+        })
         .filter_map(std::result::Result::err)
-        .flatten()
         .map(|err| err.message())
         .collect();
 
-    if errors.is_empty() {
+    if result.is_empty() {
         Ok(RES.to_owned())
     } else {
-        Err(errors.into_iter().collect())
+        Err(result.into_iter().collect())
     }
 }
 
