@@ -39,7 +39,7 @@ enum Commands {
         #[arg(short, long, env = "Q_NUM", default_value_t = 100)]
         num: i64,
     },
-    /// [PREVIEW] validate a dsv file against a dsv schema
+    /// [STABLE] validate a dsv file against a dsv schema
     Validation {
         #[arg(short, long, env = "Q_SCHEMA_SOURCE")]
         schema: String,
