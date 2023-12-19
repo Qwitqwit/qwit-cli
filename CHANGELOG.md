@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## Fixed
+
+Performance bottleneck for validation
+
 
 ## [1.0.0] - 2023-12-13
 
