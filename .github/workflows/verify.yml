@@ -1,0 +1,30 @@
+name: Create github release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    - [ main ]
+
+jobs:
+  test-and-create-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack@0.5,cargo-deny@0.13,just@1,hurl@4,cargo-edit@0.12
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - run: just verify
+      - name: create docker images
+        working-directory: ./distributions
+        run: |
+          just build-docker-image ${{ github.sha }}
+          just push-docker
