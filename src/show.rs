@@ -1,12 +1,12 @@
-use std::{fs::File, num::TryFromIntError};
+use std::{fs::File, num::TryFromIntError, path::PathBuf};
 
 use qwitlib::lines::read_file_lines;
 
-pub fn csv(source: String, num: i64) -> Result<String, String> {
+pub fn csv(source: &PathBuf, num: i64) -> Result<String, String> {
     let num_sized: usize = num
         .try_into()
         .map_err(|err: TryFromIntError| err.to_string())?;
-    let file = File::open(source).map_err(|err| err.to_string())?;
+    let file = File::open(source.clone()).map_err(|err| format!("source: {source:?} {err}"))?;
     read(file, num_sized)
 }
 

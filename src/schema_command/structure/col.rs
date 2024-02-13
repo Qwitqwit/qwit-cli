@@ -18,7 +18,7 @@ impl Column {
             .collect();
 
         let header = values
-            .get(0)
+            .first()
             .ok_or("did not find anything at pos 0, header should be here".to_owned())?;
         let tipe: &String = values
             .get(1)

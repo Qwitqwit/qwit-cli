@@ -3,6 +3,8 @@ set dotenv-load := true
 alias v := verify
 alias r := run
 
+image_name := "ghcr.io/optravis-llc/qwit-cli"
+
 bt := '0'
 log := "warn"
 
@@ -13,7 +15,6 @@ run:
     cargo run
 
 install:
-    cargo build --release
     cargo install --path .
 
 # Perform all verifications (compile, test, lint, etc.)
@@ -61,3 +62,10 @@ release *args: verify
     test $GITHUB_TOKEN
     test $CARGO_REGISTRY_TOKEN
     cargo release {{args}}
+
+
+
+# example how to run it, you need to build it first obv.
+run-docker:
+    cd distributions && just build-docker
+    docker run --rm -v ./testfiles/tmp/test.csv:/testfiles/tmp/test.csv -t {{image_name}}:latest show --source testfiles/tmp/test.csv

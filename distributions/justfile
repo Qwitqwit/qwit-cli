@@ -1,0 +1,18 @@
+
+image_name := "ghcr.io/optravis-llc/qwit-cli"
+
+
+build-docker:
+  just build-docker-image $(just get-git-hash)
+
+@get-git-hash:
+  cd .. && git rev-parse --short HEAD
+
+build-docker-image tag:
+  cd .. && docker build  -t {{image_name}}:{{tag}} .
+  docker tag {{image_name}}:{{tag}} {{image_name}}:latest
+
+push-docker:
+  cd .. && docker push {{image_name}} --all-tags
+
+

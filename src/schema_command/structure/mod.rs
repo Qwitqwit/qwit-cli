@@ -136,7 +136,7 @@ impl PositionedErrorString for Vec<String> {
         let mut first = splitted.0.to_vec();
         let second = splitted.1;
         let splitted_second: (&[String], &[String]) = second.split_at(1);
-        let error_value = splitted_second.0.get(0);
+        let error_value = splitted_second.0.first();
         let mut third = splitted_second.1.to_vec();
 
         let value = match error_value {

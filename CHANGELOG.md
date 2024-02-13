@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## Added
+
+Docker distribution
 
 ## [1.1.0] - 2023-12-19
 
