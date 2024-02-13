@@ -27,8 +27,9 @@ jobs:
       - name: create docker images
         working-directory: ./distributions
         run: |
-          just 
-          
+          just build-docker-image ${{ ref.name }}
+          just push-docker
+
       - uses: taiki-e/create-gh-release-action@v1
         with:
           changelog: CHANGELOG.md

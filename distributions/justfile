@@ -2,9 +2,6 @@
 image_name := "ghcr.io/optravis-llc/qwit-cli"
 
 
-build-docker:
-  just build-docker-image $(just get-git-hash)
-
 @get-git-hash:
   cd .. && git rev-parse --short HEAD
 
