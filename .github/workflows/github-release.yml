@@ -2,6 +2,7 @@ name: Create github release
 
 permissions:
   contents: write
+  packages: write
 
 on:
   push:
