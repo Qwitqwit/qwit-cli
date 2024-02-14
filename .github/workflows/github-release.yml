@@ -10,13 +10,45 @@ on:
       - v[0-9]+.*
 
 jobs:
-  create-release:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-hack@0.5,cargo-deny@0.13,just@1,hurl@4,cargo-edit@0.12
+      - run: just verify
+
+  create-windows-installer:
+    needs: verify
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just@1
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '3.1.x'
+      - name: install wix
+        run: dotnet tool install --global wix
+      - run: wix --version
+      - run: cargo install cargo-wix
+      - run: cargo wix
+      - name: Step 3 - Use the Upload Artifact GitHub Action
+      uses: actions/upload-artifact@v2
+      with: 
+        name: assets-for-download
+        path: downloads    
+      
+
+  create-release-and-docker-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just@1
 
       - uses: docker/login-action@v3
         with:
@@ -24,7 +56,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - run: just verify
       - name: create docker images
         working-directory: ./distributions
         run: |

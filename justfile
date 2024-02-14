@@ -69,3 +69,8 @@ release *args: verify
 run-docker:
     cd distributions && just build-docker
     docker run --rm -v ./testfiles/tmp/test.csv:/testfiles/tmp/test.csv -t {{image_name}}:latest show --source testfiles/tmp/test.csv
+
+
+[windows]
+wix:
+    
