@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 
 mod commands;
+mod from_exel;
 mod schema_command;
 mod show;
 

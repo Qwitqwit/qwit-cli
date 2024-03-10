@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
 use crate::schema_command::validation;
-use crate::show;
+use crate::{from_exel, show};
 
 pub fn figure() -> Result<String, String> {
     let cli = Cli::parse();
@@ -17,6 +17,10 @@ pub fn figure() -> Result<String, String> {
         Some(Commands::Show { source, num }) => show::csv(
             &std::string::String::combine_with_working_dir(source, cli.working_dir),
             num,
+        ),
+        Some(Commands::Excel { source, target }) => from_exel::all(
+            &std::string::String::combine_with_working_dir(source, cli.working_dir.clone()),
+            &std::string::String::combine_with_working_dir(target, cli.working_dir),
         ),
         None => Ok("try qwit --help for information on how to use qwit".to_string()),
     };
@@ -71,5 +75,12 @@ enum Commands {
         schema: String,
         #[arg(short, long, env = "Q_SOURCE")]
         source: String,
+    },
+    /// [PREVIEW] from a excel file create a csv file, for now it only prints out the values in raw
+    Excel {
+        #[arg(short, long, env = "Q_EXCEL_SOURCE")]
+        source: String,
+        #[arg(short, long, env = "Q_EXCEL_TARGET")]
+        target: String,
     },
 }

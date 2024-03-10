@@ -17,6 +17,7 @@ log = "0.4.20"
 qwitlib = "0.1.2"
 rand = "0.8.5"
 walkdir = "2"
+calamine = "0.24"
 
 [dev-dependencies]
 tempfile = "3"
