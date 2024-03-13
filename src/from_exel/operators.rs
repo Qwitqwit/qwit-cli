@@ -32,11 +32,11 @@ impl CsvRowOperator for FileWritingOperator {
         &mut self,
         rows: impl Iterator<Item = impl Iterator<Item = CsvValue>>,
     ) -> Result<(), CsvError> {
-        let _ = rows.map(|r| {
+        rows.for_each(|r| {
             let values: Vec<String> = r.filter_map(|v| v.0.ok()).collect();
-            let len = values.len();
+            let len = values.len() - 1;
 
-            let _ = values.iter().enumerate().map(|(n, v)| {
+            values.iter().enumerate().for_each(|(n, v)| {
                 self.write(v);
                 if n != len {
                     self.sep(";");

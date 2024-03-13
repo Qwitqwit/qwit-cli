@@ -9,25 +9,35 @@ pub fn read(source: &PathBuf, target: &PathBuf) -> Result<String, String> {
     let sce = PathBuf::from(source);
     match sce.extension().and_then(|s| s.to_str()) {
         Some("xlsx" | "xlsm" | "xlsb" | "xls") => (),
-        _ => panic!("Expecting an excel file"),
+        _ => return Err("Expecting an excel file".to_owned()),
     }
-
-    // create or append to target file
-    let target_path = PathBuf::from(target).with_extension("csv");
-    let target_file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(target_path)
-        .unwrap();
-    let target = BufWriter::new(target_file);
 
     // open xl file
     let mut xl = open_workbook_auto(&sce).unwrap();
-    let range = xl.worksheet_range_at(0).unwrap().unwrap();
+    xl.worksheets().iter().for_each(|sheet| {
+        let title = &sheet.0;
+        let range = &sheet.1;
 
-    write_range(&range, FileWritingOperator { writer: target })
-        .map(|()| "All done".to_owned())
-        .map_err(|err| err.0)
+        // create or append to target file
+        let target_path = PathBuf::from(target).with_extension("csv");
+        let target_file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(target_path)
+            .unwrap();
+        let target = BufWriter::new(target_file);
+
+        let res = write_range(range, FileWritingOperator { writer: target })
+            .map(|()| format!("Done writing sheet: {title}"))
+            .map_err(|err| err.0);
+
+        match res {
+            Ok(o) => println!("{o}"),
+            Err(e) => eprint! {"{e}"},
+        }
+    });
+
+    Ok("All Done".to_owned())
 }
 
 fn write_range(range: &Range<Data>, mut operator: impl CsvRowOperator) -> Result<(), CsvError> {
