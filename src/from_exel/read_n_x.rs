@@ -50,5 +50,7 @@ fn write_range(
     sep: String,
 ) -> Result<(), CsvError> {
     let all_rows = range.rows().map(CsvRow::iterator);
+    let rows_len = all_rows.size_hint().0;
+    println!("-- reading {rows_len} lines --");
     operator.operate(sep, all_rows)
 }

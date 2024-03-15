@@ -4,7 +4,9 @@
 
 ## Added
 
-- respect separaotir for excel conversion
+- convert raw date values to actual dates
+- respect separator for excel conversion
+
 
 
 ## [1.3.1] - 2024-02-14

@@ -1,4 +1,5 @@
 use calamine::Data;
+use qwitlib::epoch_conversion::ExcelEpoch;
 use std::path::PathBuf;
 
 use self::read_n_x::read;
@@ -35,6 +36,7 @@ impl CsvRow {
 #[derive(Debug, Clone)]
 struct CsvValue(Result<String, String>);
 
+#[allow(clippy::cast_possible_truncation)]
 impl From<Data> for CsvValue {
     fn from(value: Data) -> Self {
         match value {
@@ -46,7 +48,13 @@ impl From<Data> for CsvValue {
                 let escaped = s.replace(';', "");
                 CsvValue(Ok(escaped))
             }
-            Data::DateTime(ref f) => CsvValue(Ok(f.to_string())),
+
+            Data::DateTime(ref f) => {
+                let as_int = f.as_f64().round() as i64;
+                let epoch = ExcelEpoch(as_int);
+                let as_string = epoch.to_string();
+                CsvValue(Ok(as_string))
+            }
 
             Data::Float(ref f) => CsvValue(Ok(f.to_string())),
             // we also just write for those
