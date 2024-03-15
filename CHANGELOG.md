@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## Added
+
+- respect separaotir for excel conversion
+
 
 ## [1.3.1] - 2024-02-14
 

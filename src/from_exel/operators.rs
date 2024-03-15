@@ -10,6 +10,7 @@ pub struct PrintOperator;
 impl CsvRowOperator for PrintOperator {
     fn operate(
         &mut self,
+        _separator: String,
         rows: impl Iterator<Item = impl Iterator<Item = CsvValue>>,
     ) -> Result<(), CsvError> {
         rows.for_each(|r| {
@@ -30,6 +31,7 @@ pub struct FileWritingOperator {
 impl CsvRowOperator for FileWritingOperator {
     fn operate(
         &mut self,
+        separator: String,
         rows: impl Iterator<Item = impl Iterator<Item = CsvValue>>,
     ) -> Result<(), CsvError> {
         rows.for_each(|r| {
@@ -39,7 +41,7 @@ impl CsvRowOperator for FileWritingOperator {
             values.iter().enumerate().for_each(|(n, v)| {
                 self.write(v);
                 if n != len {
-                    self.sep(";");
+                    self.sep(&separator);
                 }
             });
 

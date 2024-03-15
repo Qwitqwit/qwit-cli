@@ -6,8 +6,8 @@ use self::read_n_x::read;
 mod operators;
 mod read_n_x;
 
-pub fn all(source: &PathBuf, target: &PathBuf) -> Result<String, String> {
-    read(source, target)
+pub fn all(source: &PathBuf, target: &PathBuf, sep: &str) -> Result<String, String> {
+    read(source, target, sep)
 }
 
 #[derive(Debug)]
@@ -16,6 +16,7 @@ struct CsvError(String);
 trait CsvRowOperator {
     fn operate(
         &mut self,
+        separator: String,
         rows: impl Iterator<Item = impl Iterator<Item = CsvValue>>,
     ) -> Result<(), CsvError>;
 }

@@ -4,7 +4,7 @@ use calamine::{open_workbook_auto, Data, Range, Reader};
 
 use super::{operators::FileWritingOperator, CsvError, CsvRow, CsvRowOperator};
 
-pub fn read(source: &PathBuf, target: &PathBuf) -> Result<String, String> {
+pub fn read(source: &PathBuf, target: &PathBuf, sep: &str) -> Result<String, String> {
     // find source file
     let sce = PathBuf::from(source);
     match sce.extension().and_then(|s| s.to_str()) {
@@ -27,9 +27,13 @@ pub fn read(source: &PathBuf, target: &PathBuf) -> Result<String, String> {
             .unwrap();
         let target = BufWriter::new(target_file);
 
-        let res = write_range(range, FileWritingOperator { writer: target })
-            .map(|()| format!("Done writing sheet: {title}"))
-            .map_err(|err| err.0);
+        let res = write_range(
+            range,
+            FileWritingOperator { writer: target },
+            sep.to_owned(),
+        )
+        .map(|()| format!("Done writing sheet: {title}"))
+        .map_err(|err| err.0);
 
         match res {
             Ok(o) => println!("{o}"),
@@ -40,7 +44,11 @@ pub fn read(source: &PathBuf, target: &PathBuf) -> Result<String, String> {
     Ok("All Done".to_owned())
 }
 
-fn write_range(range: &Range<Data>, mut operator: impl CsvRowOperator) -> Result<(), CsvError> {
+fn write_range(
+    range: &Range<Data>,
+    mut operator: impl CsvRowOperator,
+    sep: String,
+) -> Result<(), CsvError> {
     let all_rows = range.rows().map(CsvRow::iterator);
-    operator.operate(all_rows)
+    operator.operate(sep, all_rows)
 }

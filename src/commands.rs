@@ -21,6 +21,7 @@ pub fn figure() -> Result<String, String> {
         Some(Commands::Excel { source, target }) => from_exel::all(
             &std::string::String::combine_with_working_dir(source, cli.working_dir.clone()),
             &std::string::String::combine_with_working_dir(target, cli.working_dir),
+            &cli.sep,
         ),
         None => Ok("try qwit --help for information on how to use qwit".to_string()),
     };
