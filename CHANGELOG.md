@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [1.4.0] - 2024-03-15
+
 ## Added
 
 - convert raw date values to actual dates
@@ -99,7 +102,8 @@ Add readme
 Initial release
 
 
-[Unreleased]: https://github.com/Qwitqwit/qwit-cli/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/Qwitqwit/qwit-cli/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/Qwitqwit/qwit-cli/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/Qwitqwit/qwit-cli/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qwitqwit/qwit-cli/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/Qwitqwit/qwit-cli/compare/v1.2.2...v1.2.3
