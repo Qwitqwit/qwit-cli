@@ -24,7 +24,7 @@ fn read(source: File, num_sized: usize) -> Result<String, String> {
         }
     });
     println!();
-    Ok("_________file end_________".to_owned())
+    Ok(format!("_________{num_sized} lines shown_________"))
 }
 
 #[cfg(test)]

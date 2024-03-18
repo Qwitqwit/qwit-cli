@@ -1,7 +1,10 @@
 use std::{
+    fmt,
     fs::File,
     io::{BufWriter, Write},
 };
+
+use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 
 use super::{CsvError, CsvRowOperator, CsvValue};
 
@@ -34,6 +37,19 @@ impl CsvRowOperator for FileWritingOperator {
         separator: String,
         rows: impl Iterator<Item = impl Iterator<Item = CsvValue>>,
     ) -> Result<(), CsvError> {
+        let size_hint = rows.size_hint().0;
+        let pb = ProgressBar::new(size_hint.try_into().expect("size hint is too big"));
+
+        pb.set_style(
+            ProgressStyle::with_template(
+                "{spinner:.dim.bold} [{elapsed_precise}] [{wide_bar:.}] ({eta})",
+            )
+            .unwrap()
+            .with_key("eta", |state: &ProgressState, w: &mut dyn fmt::Write| {
+                write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap();
+            }),
+        );
+
         rows.for_each(|r| {
             let values: Vec<String> = r.filter_map(|v| v.0.ok()).collect();
             let len = values.len() - 1;
@@ -46,7 +62,10 @@ impl CsvRowOperator for FileWritingOperator {
             });
 
             self.end_line();
+            pb.inc(1);
         });
+
+        pb.finish_with_message(format!("written {size_hint} rows"));
         Ok(())
     }
 }
