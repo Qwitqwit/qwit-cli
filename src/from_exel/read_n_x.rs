@@ -1,12 +1,11 @@
 use std::{fs::OpenOptions, io::BufWriter, path::PathBuf, time::Instant};
 
-use calamine::{open_workbook_auto, Data, Range, Reader};
-use indicatif::{HumanDuration, ProgressBar, ProgressStyle};
-
-use super::{operators::FileWritingOperator, CsvError, CsvRow, CsvRowOperator};
+use calamine::{open_workbook_auto, Reader};
+use indicatif::{HumanDuration, ProgressBar};
 
 pub fn read(source: &PathBuf, target: &PathBuf, sep: &str) -> Result<String, String> {
     let started = Instant::now();
+
     // find source file
     let sce = PathBuf::from(source);
     match sce.extension().and_then(|s| s.to_str()) {
@@ -31,7 +30,13 @@ pub fn read(source: &PathBuf, target: &PathBuf, sep: &str) -> Result<String, Str
         HumanDuration(started.elapsed())
     );
 
-    xl.worksheets().iter().for_each(|sheet| {
+    let worksheets = xl.worksheets();
+
+    let worksheet_amount = worksheets.len();
+
+    let pb = ProgressBar::new(worksheet_amount.try_into().unwrap());
+
+    for sheet in &worksheets {
         let title = &sheet.0;
         let range = &sheet.1;
         // create or append to target file
@@ -50,40 +55,20 @@ pub fn read(source: &PathBuf, target: &PathBuf, sep: &str) -> Result<String, Str
             HumanDuration(started.elapsed())
         );
 
-        let res = write_range(
+        let res = qwitlib::from_excel::write_range(
             range,
-            FileWritingOperator { writer: target },
+            qwitlib::from_excel::operators::FileWritingOperator { writer: target },
             sep.to_owned(),
-            started,
         )
-        .map_err(|err| err.0);
+        .map_err(|err| err.to_string());
 
         match res {
             Ok(()) => {}
             Err(e) => eprint! {"{e}"},
         }
-    });
-
-    Ok("All sheets written".to_owned())
-}
-
-fn write_range(
-    range: &Range<Data>,
-    mut operator: impl CsvRowOperator,
-    sep: String,
-    started: Instant,
-) -> Result<(), CsvError> {
-    let spinner_style =
-        ProgressStyle::with_template("{prefix:.bold.dim} {spinner} {wide_msg}").unwrap();
-    let pb = ProgressBar::new(range.get_size().0.try_into().unwrap());
-    pb.set_style(spinner_style);
-
-    let all_rows = range.rows().map(|r| {
         pb.inc(1);
-        CsvRow::iterator(r)
-    });
-    let res = operator.operate(sep, all_rows);
-    pb.finish_and_clear();
-    println!("Done in {}", HumanDuration(started.elapsed()));
-    res
+    }
+
+    pb.finish_with_message(format!("Done in {}", HumanDuration(started.elapsed())));
+    Ok("All sheets written".to_owned())
 }
