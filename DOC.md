@@ -21,7 +21,7 @@ qwit cli
 * `markdown` — [STABLE] print markdown doc of qwit to std out
 * `show` — [STABLE] show the dsv from the start in a nice way
 * `validation` — [STABLE] validate a dsv file against a dsv schema
-* `excel` — [PREVIEW] from a excel file create a csv file, for now it only prints out the values in raw
+* `excel` — [PREVIEW] convert a excel file to a csv/dsv file
 
 ###### **Options:**
 
@@ -70,7 +70,7 @@ qwit cli
 
 ## `qwit excel`
 
-[PREVIEW] from a excel file create a csv file, for now it only prints out the values in raw
+[PREVIEW] convert a excel file to a csv/dsv file
 
 **Usage:** `qwit excel --source <SOURCE> --target <TARGET>`
 

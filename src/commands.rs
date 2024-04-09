@@ -77,7 +77,7 @@ enum Commands {
         #[arg(short, long, env = "Q_SOURCE")]
         source: String,
     },
-    /// [PREVIEW] from a excel file create a csv file, for now it only prints out the values in raw
+    /// [PREVIEW] convert a excel file to a csv/dsv file
     Excel {
         #[arg(short, long, env = "Q_EXCEL_SOURCE")]
         source: String,
