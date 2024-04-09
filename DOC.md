@@ -8,6 +8,7 @@ This document contains the help content for the `qwit` command-line program.
 * [`qwit markdown`↴](#qwit-markdown)
 * [`qwit show`↴](#qwit-show)
 * [`qwit validation`↴](#qwit-validation)
+* [`qwit excel`↴](#qwit-excel)
 
 ## `qwit`
 
@@ -19,13 +20,15 @@ qwit cli
 
 * `markdown` — [STABLE] print markdown doc of qwit to std out
 * `show` — [STABLE] show the dsv from the start in a nice way
-* `validation` — [PREVIEW] validate a dsv file against a dsv schema
+* `validation` — [STABLE] validate a dsv file against a dsv schema
+* `excel` — [PREVIEW] from a excel file create a csv file, for now it only prints out the values in raw
 
 ###### **Options:**
 
 * `-s`, `--sep <SEP>`
 
   Default value: `;`
+* `-w`, `--working-dir <WORKING_DIR>`
 
 
 
@@ -54,15 +57,27 @@ qwit cli
 
 ## `qwit validation`
 
-[PREVIEW] validate a dsv file against a dsv schema
+[STABLE] validate a dsv file against a dsv schema
 
-**Usage:** `qwit validation [OPTIONS] --schema <SCHEMA> --source <SOURCE>`
+**Usage:** `qwit validation --schema <SCHEMA> --source <SOURCE>`
 
 ###### **Options:**
 
 * `-s`, `--schema <SCHEMA>`
 * `-s`, `--source <SOURCE>`
-* `-n`, `--num <NUM>`
+
+
+
+## `qwit excel`
+
+[PREVIEW] from a excel file create a csv file, for now it only prints out the values in raw
+
+**Usage:** `qwit excel --source <SOURCE> --target <TARGET>`
+
+###### **Options:**
+
+* `-s`, `--source <SOURCE>`
+* `-t`, `--target <TARGET>`
 
 
 
