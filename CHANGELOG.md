@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## Fixed
+
+- documentation
+
 
 ## [1.5.0] - 2024-03-20
 
